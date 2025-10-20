@@ -7,5 +7,7 @@ dependencies = [
   "pandas", "numpy", "numba", "vectorbt",
   "quantstats", "empyrical-reloaded",
   "prefect", "pydantic", "pyyaml",
-  "ccxt", "ib-async", "pandas-ta", "tsfresh"
+  "ccxt", "ib-async",
+  "freqtrade",
+  "ta-lib"
 ]
