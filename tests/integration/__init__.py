@@ -1,0 +1,1 @@
+# TradingSystemStack - Integration Tests Package

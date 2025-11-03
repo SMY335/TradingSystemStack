@@ -1,0 +1,1 @@
+# TradingSystemStack - Adapters Package
