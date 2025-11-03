@@ -1,7 +1,0 @@
-datasets:
-  - id: demo_eurusd_h1
-    symbols: ["EURUSD"]
-    timeframe: "H1"
-    path: "data/fx/demo_eurusd_h1.csv"
-    checksum: ""
-    fees: { spread_pips: 0.2, commission_per_million: 30 }
