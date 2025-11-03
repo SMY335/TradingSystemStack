@@ -1,0 +1,148 @@
+# Nautilus Trader Configuration
+# Trading Node Configuration for TradingSystemStack
+
+# Logging Configuration
+logging:
+  log_level: INFO
+  log_directory: logs/nautilus
+  log_file_format: "{time:YYYY-MM-DD HH:mm:ss} | {level} | {name}:{function}:{line} | {message}"
+  log_colors: true
+  log_to_file: true
+  log_file_name: nautilus_trader_{time}.log
+
+# Data Configuration
+data:
+  catalog_path: data/arctic_db
+  use_cache: true
+  cache_size_mb: 1024
+  tick_capacity: 10000
+  bar_capacity: 10000
+
+# Execution Configuration
+execution:
+  # Order ID generation
+  default_client_order_id_tag: "NT"
+  
+  # Order Management System type (NETTING or HEDGING)
+  oms_type: NETTING
+  
+  # Fill model
+  fill_model: "probability"
+  
+  # Latency model
+  latency_model:
+    insert_latency_ms: 10
+    cancel_latency_ms: 5
+    update_latency_ms: 5
+
+# Risk Management Configuration
+risk:
+  # Position limits
+  max_notional_per_order: 1000000
+  max_quantity_per_order: 1000
+  
+  # Rate limits
+  max_order_rate: "100/s"
+  max_order_modify_rate: "50/s"
+  
+  # Risk checks
+  bypass_risk_checks: false
+  
+  # Stop loss/Take profit
+  default_stop_loss_pct: 0.02
+  default_take_profit_pct: 0.04
+
+# Strategy Configuration
+strategy:
+  # State management
+  load_state: true
+  save_state: true
+  state_dir: data/strategy_states
+  
+  # Performance tracking
+  track_pnl: true
+  track_returns: true
+  
+  # Execution settings
+  order_id_tag: "STRAT"
+  manage_gtd_expiry: true
+
+# Backtest Configuration
+backtest:
+  # Performance optimizations
+  use_numba: true
+  use_cython: true
+  
+  # Data loading
+  chunk_size: 100000
+  parallel_data_loading: true
+  
+  # Result storage
+  save_results_to_arctic: true
+  results_library: backtest_results
+
+# Live Trading Configuration
+live:
+  # Connection settings
+  reconnect_timeout_secs: 30
+  heartbeat_interval_secs: 10
+  
+  # Order handling
+  cancel_orders_on_disconnect: true
+  flatten_on_stop: false
+  
+  # Position reconciliation
+  reconcile_positions_on_start: true
+  reconciliation_lookback_mins: 1440
+
+# Cache Configuration
+cache:
+  # Database type (redis or memory)
+  database_type: memory
+  
+  # Memory cache settings
+  tick_capacity: 10000
+  bar_capacity: 10000
+  
+  # Flush settings
+  flush_on_start: false
+  flush_db_on_start: false
+
+# Message Bus Configuration
+msgbus:
+  # Types configuration
+  types_filter: []
+  autotrim_mins: 30
+  
+  # Subscription patterns
+  patterns_filter: []
+  
+  # Database backing
+  database_backing: false
+
+# Actor Configuration
+actors:
+  # Custom actors can be added here
+  enabled: []
+
+# Import Configuration
+imports:
+  # Custom strategy/actor modules
+  modules: []
+
+# System Configuration
+system:
+  # Clock precision
+  clock_precision: MILLISECOND
+  
+  # ID generator
+  trader_id: "TRADER-001"
+  instance_id: "001"
+  
+  # Snapshot settings
+  snapshot_orders: true
+  snapshot_positions: true
+  snapshot_positions_interval_secs: 5
+  
+  # Performance settings
+  use_rust_core: true

@@ -1,0 +1,39 @@
+Collecting nautilus_trader
+  Downloading nautilus_trader-1.221.0-cp312-cp312-manylinux_2_35_x86_64.whl.metadata (34 kB)
+Requirement already satisfied: click<9.0.0,>=8.0.0 in /usr/local/python/3.12.1/lib/python3.12/site-packages (from nautilus_trader) (8.3.0)
+Collecting fsspec<2026.0.0,>=2025.2.0 (from nautilus_trader)
+  Downloading fsspec-2025.10.0-py3-none-any.whl.metadata (10 kB)
+Collecting msgspec<1.0.0,>=0.19.0 (from nautilus_trader)
+  Downloading msgspec-0.19.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.9 kB)
+Requirement already satisfied: numpy>=1.26.4 in /usr/local/python/3.12.1/lib/python3.12/site-packages (from nautilus_trader) (2.2.6)
+Requirement already satisfied: pandas<3.0.0,>=2.2.3 in /usr/local/python/3.12.1/lib/python3.12/site-packages (from nautilus_trader) (2.3.3)
+Collecting portion>=2.6.1 (from nautilus_trader)
+  Downloading portion-2.6.1-py3-none-any.whl.metadata (34 kB)
+Collecting pyarrow>=21.0.0 (from nautilus_trader)
+  Downloading pyarrow-22.0.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (3.2 kB)
+Requirement already satisfied: pytz>=2025.2.0 in /home/codespace/.local/lib/python3.12/site-packages (from nautilus_trader) (2025.2)
+Requirement already satisfied: tqdm<5.0.0,>=4.67.1 in /usr/local/python/3.12.1/lib/python3.12/site-packages (from nautilus_trader) (4.67.1)
+Collecting uvloop==0.22.1 (from nautilus_trader)
+  Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (4.9 kB)
+Requirement already satisfied: python-dateutil>=2.8.2 in /home/codespace/.local/lib/python3.12/site-packages (from pandas<3.0.0,>=2.2.3->nautilus_trader) (2.9.0.post0)
+Requirement already satisfied: tzdata>=2022.7 in /home/codespace/.local/lib/python3.12/site-packages (from pandas<3.0.0,>=2.2.3->nautilus_trader) (2025.2)
+Collecting sortedcontainers~=2.2 (from portion>=2.6.1->nautilus_trader)
+  Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl.metadata (10 kB)
+Requirement already satisfied: six>=1.5 in /home/codespace/.local/lib/python3.12/site-packages (from python-dateutil>=2.8.2->pandas<3.0.0,>=2.2.3->nautilus_trader) (1.17.0)
+Downloading nautilus_trader-1.221.0-cp312-cp312-manylinux_2_35_x86_64.whl (102.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 102.8/102.8 MB 40.5 MB/s eta 0:00:00
+Downloading uvloop-0.22.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (4.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.4/4.4 MB 46.8 MB/s eta 0:00:00
+Downloading fsspec-2025.10.0-py3-none-any.whl (200 kB)
+Downloading msgspec-0.19.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (213 kB)
+Downloading portion-2.6.1-py3-none-any.whl (27 kB)
+Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl (29 kB)
+Downloading pyarrow-22.0.0-cp312-cp312-manylinux_2_28_x86_64.whl (47.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 47.7/47.7 MB 54.2 MB/s eta 0:00:00
+Installing collected packages: sortedcontainers, uvloop, pyarrow, portion, msgspec, fsspec, nautilus_trader
+  Attempting uninstall: fsspec
+    Found existing installation: fsspec 2024.6.1
+    Uninstalling fsspec-2024.6.1:
+      Successfully uninstalled fsspec-2024.6.1
+
+Successfully installed fsspec-2025.10.0 msgspec-0.19.0 nautilus_trader-1.221.0 portion-2.6.1 pyarrow-22.0.0 sortedcontainers-2.4.0 uvloop-0.22.1
