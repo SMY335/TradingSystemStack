@@ -309,9 +309,9 @@ Le paper trading ne simule pas :
 
 ---
 
-## ✅ Portfolio & Risk Management (Phase 5)
+## ✅ Portfolio & Risk Management (Phase 5) ✨ COMPLET
 
-### Portfolio Management avec Riskfolio-Lib
+### Session 18: Portfolio Management avec Riskfolio-Lib ✅
 - [x] **Multi-asset Portfolio Management** - Gérer plusieurs actifs simultanément
 - [x] **Mean-Variance Optimization** - Optimisation Markowitz classique
 - [x] **Risk Parity Allocation** - Allocation basée sur contribution au risque
@@ -319,44 +319,84 @@ Le paper trading ne simule pas :
 - [x] **Automatic Rebalancing** - Rééquilibrage automatique (temps ou dérive)
 - [x] **Dashboard Portfolio** - Interface interactive Streamlit
 
+### Session 19: Risk Management Avancé ✅ NOUVEAU
+- [x] **VaR & CVaR Analysis** - Value at Risk et Conditional VaR (3 méthodes)
+- [x] **Monte Carlo Simulation** - 10,000+ scénarios de simulation
+- [x] **Stress Testing** - Scénarios de crash et volatilité extrême
+- [x] **Risk Attribution** - Component VaR et Marginal VaR
+- [x] **Rolling Risk Metrics** - Suivi temporel du risque
+- [x] **Dashboard Risk** - Interface complète d'analyse de risque
+
+### Session 20: Performance Attribution ✅ NOUVEAU
+- [x] **Brinson Attribution** - Décomposition allocation vs sélection
+- [x] **Risk Attribution** - Contribution au risque par actif
+- [x] **Factor Attribution** - Attribution factorielle (Market, Value, Momentum)
+- [x] **Rolling Attribution** - Analyse temporelle de l'attribution
+- [x] **TWR & MWR** - Time-Weighted et Money-Weighted Returns
+- [x] **Dashboard Attribution** - Visualisation complète des performances
+
 ### Utilisation
 
 ```bash
-# Dashboard Portfolio Management
+# Dashboard Portfolio Management (Session 18)
 ./run_portfolio_dashboard.sh
+
+# Dashboard Risk Management (Session 19) ✨ NOUVEAU
+./run_risk_dashboard.sh
+
+# Dashboard Performance Attribution (Session 20) ✨ NOUVEAU
+./run_attribution_dashboard.sh
 ```
 
-Consultez **[PORTFOLIO_GUIDE.md](PORTFOLIO_GUIDE.md)** pour le guide complet.
+Consultez les guides complets:
+- **[PORTFOLIO_GUIDE.md](PORTFOLIO_GUIDE.md)** - Gestion de portfolio
+- **[RISK_MANAGEMENT_GUIDE.md](RISK_MANAGEMENT_GUIDE.md)** - Risk management ✨ NOUVEAU
+- **[ATTRIBUTION_GUIDE.md](ATTRIBUTION_GUIDE.md)** - Performance attribution ✨ NOUVEAU
 
-**Fonctionnalités :**
+**Fonctionnalités complètes :**
+
+**Portfolio Management:**
 - Optimisation multi-stratégies (Mean-Variance, Risk Parity, Max Sharpe, Min Volatility)
-- Mesures de risque avancées (VaR, CVaR, Max Drawdown, Sharpe, Sortino)
 - Rééquilibrage automatique basé sur temps ou dérive
 - Frontière efficiente
-- Analyse d'attribution de performance
 - Gestion de contraintes (poids min/max)
+
+**Risk Management:**
+- VaR/CVaR (Historical, Parametric, Monte Carlo)
+- Stress testing (4 scénarios : crash -20%, -50%, vol spike, corr breakdown)
+- Component VaR et Marginal VaR
+- Tail risk metrics (Skewness, Kurtosis)
+- Rolling risk analysis
+
+**Performance Attribution:**
+- Brinson attribution (Allocation + Selection + Interaction)
+- Asset contribution analysis
+- Factor attribution (Market, Value, Momentum, Alpha)
+- Risk contribution par actif
+- Time-Weighted vs Money-Weighted returns
 
 ## 🎯 Roadmap Future
 
-### Court Terme (Déjà planifié)
-- [ ] Risk Management Avancé (VaR/CVaR stress testing) - Phase 5 Session 19
-- [ ] Performance Attribution (Factor & Strategy attribution) - Phase 5 Session 20
+### Court Terme
 - [ ] Intégration FinRL pour Deep Reinforcement Learning
-- [ ] Plus de stratégies (Bollinger Bands, Ichimoku)
+- [ ] Plus de stratégies (Bollinger Bands, Ichimoku, SuperTrend)
 - [ ] Walk-forward optimization
-- [ ] Monte Carlo simulation
+- [ ] Multi-timeframe analysis
+- [ ] Portfolio optimization avec contraintes avancées
 
 ### Moyen Terme
-- [ ] Multi-assets portfolio management
 - [ ] Position sizing dynamique (Kelly Criterion)
-- [ ] Stop-loss/Take-profit adaptatifs
+- [ ] Stop-loss/Take-profit adaptatifs ML-based
 - [ ] Dashboard d'optimisation de paramètres
+- [ ] Backtesting multi-exchange
+- [ ] Options et derivatives support
 
 ### Long Terme
 - [ ] Support live trading (après validation rigoureuse)
-- [ ] Base de données pour historique
+- [ ] Base de données pour historique (TimescaleDB)
 - [ ] API REST pour contrôle externe
 - [ ] Déploiement cloud (Docker, K8s)
+- [ ] Social trading features
 
 ---
 
