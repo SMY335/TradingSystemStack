@@ -2,6 +2,7 @@
 Moteur de backtesting avancé avec Backtrader pour niveau institutionnel
 """
 import backtrader as bt
+import logging
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -10,6 +11,12 @@ import numpy as np
 from src.infrastructure.data_manager import UnifiedDataManager
 from src.adapters.strategy_factory import StrategyFactory
 from src.adapters.base_strategy_adapter import StrategyConfig, StrategyFramework
+
+# Configure logging
+logger = logging.getLogger(__name__)
+
+# Valid timeframes for backtesting
+VALID_TIMEFRAMES = ['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '8h', '12h', '1d', '3d', '1w', '1M']
 
 
 @dataclass
@@ -26,6 +33,77 @@ class BacktestConfig:
     slippage_percent: float = 0.0005  # 0.05%
     position_size_percent: float = 0.95
     
+    def __post_init__(self):
+        """Validate configuration parameters"""
+        # Validate strategy_name
+        if not self.strategy_name or not isinstance(self.strategy_name, str):
+            raise ValueError("strategy_name must be a non-empty string")
+        
+        # Validate strategy_params
+        if not isinstance(self.strategy_params, dict):
+            raise TypeError(f"strategy_params must be dict, got {type(self.strategy_params)}")
+        
+        # Validate symbols
+        if not self.symbols or not isinstance(self.symbols, list):
+            raise ValueError("symbols must be a non-empty list")
+        
+        if not all(isinstance(s, str) and s for s in self.symbols):
+            raise ValueError("All symbols must be non-empty strings")
+        
+        # Validate timeframe
+        if self.timeframe not in VALID_TIMEFRAMES:
+            raise ValueError(
+                f"Invalid timeframe '{self.timeframe}'. Must be one of {VALID_TIMEFRAMES}"
+            )
+        
+        # Validate dates
+        if not isinstance(self.start_date, datetime):
+            raise TypeError(f"start_date must be datetime, got {type(self.start_date)}")
+        
+        if not isinstance(self.end_date, datetime):
+            raise TypeError(f"end_date must be datetime, got {type(self.end_date)}")
+        
+        if self.start_date >= self.end_date:
+            raise ValueError(
+                f"start_date ({self.start_date}) must be before end_date ({self.end_date})"
+            )
+        
+        if self.end_date > datetime.now():
+            raise ValueError(f"end_date ({self.end_date}) cannot be in the future")
+        
+        # Validate initial_capital
+        if not isinstance(self.initial_capital, (int, float)):
+            raise TypeError(f"initial_capital must be numeric, got {type(self.initial_capital)}")
+        
+        if self.initial_capital <= 0:
+            raise ValueError(f"initial_capital must be positive, got {self.initial_capital}")
+        
+        if self.initial_capital < 100:
+            logger.warning(f"initial_capital is very low: ${self.initial_capital}")
+        
+        # Validate commission
+        if not isinstance(self.commission, (int, float)):
+            raise TypeError(f"commission must be numeric, got {type(self.commission)}")
+        
+        if self.commission < 0 or self.commission > 1:
+            raise ValueError(f"commission must be between 0 and 1 (0-100%), got {self.commission}")
+        
+        # Validate slippage_percent
+        if not isinstance(self.slippage_percent, (int, float)):
+            raise TypeError(f"slippage_percent must be numeric, got {type(self.slippage_percent)}")
+        
+        if self.slippage_percent < 0 or self.slippage_percent > 0.1:
+            raise ValueError(f"slippage_percent must be between 0 and 0.1 (0-10%), got {self.slippage_percent}")
+        
+        # Validate position_size_percent
+        if not isinstance(self.position_size_percent, (int, float)):
+            raise TypeError(f"position_size_percent must be numeric, got {type(self.position_size_percent)}")
+        
+        if self.position_size_percent <= 0 or self.position_size_percent > 1:
+            raise ValueError(f"position_size_percent must be between 0 and 1, got {self.position_size_percent}")
+        
+        logger.info(f"BacktestConfig validated: {self.strategy_name} on {len(self.symbols)} symbols")
+    
 
 @dataclass
 class TransactionCosts:
@@ -34,6 +112,38 @@ class TransactionCosts:
     taker_fee: float = 0.0004  # 0.04% Binance taker
     slippage_model: str = "fixed"  # "fixed", "volumetric", "sqrt"
     slippage_basis_points: float = 5  # 0.05%
+    
+    def __post_init__(self):
+        """Validate transaction cost parameters"""
+        # Validate maker_fee
+        if not isinstance(self.maker_fee, (int, float)):
+            raise TypeError(f"maker_fee must be numeric, got {type(self.maker_fee)}")
+        
+        if self.maker_fee < 0 or self.maker_fee > 0.01:
+            raise ValueError(f"maker_fee must be between 0 and 0.01 (0-1%), got {self.maker_fee}")
+        
+        # Validate taker_fee
+        if not isinstance(self.taker_fee, (int, float)):
+            raise TypeError(f"taker_fee must be numeric, got {type(self.taker_fee)}")
+        
+        if self.taker_fee < 0 or self.taker_fee > 0.01:
+            raise ValueError(f"taker_fee must be between 0 and 0.01 (0-1%), got {self.taker_fee}")
+        
+        # Validate slippage_model
+        valid_models = ['fixed', 'volumetric', 'sqrt']
+        if self.slippage_model not in valid_models:
+            raise ValueError(
+                f"Invalid slippage_model '{self.slippage_model}'. Must be one of {valid_models}"
+            )
+        
+        # Validate slippage_basis_points
+        if not isinstance(self.slippage_basis_points, (int, float)):
+            raise TypeError(f"slippage_basis_points must be numeric, got {type(self.slippage_basis_points)}")
+        
+        if self.slippage_basis_points < 0 or self.slippage_basis_points > 100:
+            raise ValueError(f"slippage_basis_points must be between 0 and 100, got {self.slippage_basis_points}")
+        
+        logger.debug(f"TransactionCosts validated: maker={self.maker_fee}, taker={self.taker_fee}")
     
     def calculate_slippage(self, price: float, volume: float = None) -> float:
         """Calculer le slippage selon le modèle"""
@@ -70,6 +180,20 @@ class AdvancedBacktestEngine:
     """Moteur de backtesting de niveau institutionnel avec Backtrader"""
     
     def __init__(self, config: BacktestConfig, transaction_costs: TransactionCosts):
+        # Validate config
+        if config is None:
+            raise ValueError("config cannot be None")
+        
+        if not isinstance(config, BacktestConfig):
+            raise TypeError(f"config must be BacktestConfig, got {type(config)}")
+        
+        # Validate transaction_costs
+        if transaction_costs is None:
+            raise ValueError("transaction_costs cannot be None")
+        
+        if not isinstance(transaction_costs, TransactionCosts):
+            raise TypeError(f"transaction_costs must be TransactionCosts, got {type(transaction_costs)}")
+        
         self.config = config
         self.costs = transaction_costs
         self.cerebro = bt.Cerebro()
@@ -77,8 +201,27 @@ class AdvancedBacktestEngine:
         self.results = None
         self.trade_list = []
         
+        logger.info(f"AdvancedBacktestEngine initialized for {config.strategy_name}")
+        
     def _df_to_backtrader_feed(self, df: pd.DataFrame) -> bt.feeds.PandasData:
         """Convertir DataFrame en feed Backtrader"""
+        # Validate DataFrame
+        if df is None or not isinstance(df, pd.DataFrame):
+            raise TypeError("df must be a pandas DataFrame")
+        
+        if df.empty:
+            raise ValueError("DataFrame cannot be empty")
+        
+        # Check required columns
+        required_cols = ['open', 'high', 'low', 'close', 'volume']
+        missing_cols = set(required_cols) - set(df.columns)
+        if missing_cols:
+            raise ValueError(f"DataFrame missing required columns: {missing_cols}")
+        
+        # Check minimum length
+        if len(df) < 50:
+            logger.warning(f"DataFrame has only {len(df)} rows. Recommend at least 50 for meaningful backtest.")
+        
         # S'assurer que l'index est datetime
         if not isinstance(df.index, pd.DatetimeIndex):
             df.index = pd.to_datetime(df.index)
