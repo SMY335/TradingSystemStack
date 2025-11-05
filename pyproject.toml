@@ -9,5 +9,10 @@ dependencies = [
   "prefect", "pydantic", "pyyaml",
   "ccxt", "ib-async",
   "freqtrade",
-  "ta-lib"
+  "ta-lib",
+  "riskfolio-lib",
+  "streamlit",
+  "plotly",
+  "scikit-learn",
+  "scipy"
 ]

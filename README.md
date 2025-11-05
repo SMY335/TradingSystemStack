@@ -309,9 +309,38 @@ Le paper trading ne simule pas :
 
 ---
 
+## ✅ Portfolio & Risk Management (Phase 5)
+
+### Portfolio Management avec Riskfolio-Lib
+- [x] **Multi-asset Portfolio Management** - Gérer plusieurs actifs simultanément
+- [x] **Mean-Variance Optimization** - Optimisation Markowitz classique
+- [x] **Risk Parity Allocation** - Allocation basée sur contribution au risque
+- [x] **Maximum Sharpe Optimization** - Maximisation du ratio rendement/risque
+- [x] **Automatic Rebalancing** - Rééquilibrage automatique (temps ou dérive)
+- [x] **Dashboard Portfolio** - Interface interactive Streamlit
+
+### Utilisation
+
+```bash
+# Dashboard Portfolio Management
+./run_portfolio_dashboard.sh
+```
+
+Consultez **[PORTFOLIO_GUIDE.md](PORTFOLIO_GUIDE.md)** pour le guide complet.
+
+**Fonctionnalités :**
+- Optimisation multi-stratégies (Mean-Variance, Risk Parity, Max Sharpe, Min Volatility)
+- Mesures de risque avancées (VaR, CVaR, Max Drawdown, Sharpe, Sortino)
+- Rééquilibrage automatique basé sur temps ou dérive
+- Frontière efficiente
+- Analyse d'attribution de performance
+- Gestion de contraintes (poids min/max)
+
 ## 🎯 Roadmap Future
 
 ### Court Terme (Déjà planifié)
+- [ ] Risk Management Avancé (VaR/CVaR stress testing) - Phase 5 Session 19
+- [ ] Performance Attribution (Factor & Strategy attribution) - Phase 5 Session 20
 - [ ] Intégration FinRL pour Deep Reinforcement Learning
 - [ ] Plus de stratégies (Bollinger Bands, Ichimoku)
 - [ ] Walk-forward optimization
