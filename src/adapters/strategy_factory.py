@@ -3,6 +3,7 @@ Strategy Factory
 Creates strategy instances for different frameworks using adapters
 """
 from typing import Dict, Any
+import logging
 from src.adapters.base_strategy_adapter import (
     BaseStrategyAdapter,
     StrategyConfig,
@@ -11,6 +12,9 @@ from src.adapters.base_strategy_adapter import (
 from src.adapters.ema_adapter import EMAAdapter
 from src.adapters.rsi_adapter import RSIAdapter
 from src.adapters.macd_adapter import MACDAdapter
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 
 class StrategyFactory:
@@ -133,12 +137,21 @@ class StrategyFactory:
                 'parameter_space': adapter.get_parameter_space(),
                 'supported_frameworks': ['nautilus', 'backtrader']
             }
-        except Exception:
+        except (ValueError, TypeError, KeyError) as e:
             # If validation fails with empty params, return basic info
+            logger.debug(f"Could not instantiate {strategy_name} adapter with empty params: {e}. Returning basic info.")
             return {
                 'name': strategy_name,
                 'adapter_class': adapter_class.__name__,
                 'supported_frameworks': ['nautilus', 'backtrader']
+            }
+        except Exception as e:
+            logger.error(f"Unexpected error getting strategy info for {strategy_name}: {e}", exc_info=True)
+            return {
+                'name': strategy_name,
+                'adapter_class': adapter_class.__name__,
+                'supported_frameworks': ['nautilus', 'backtrader'],
+                'error': str(e)
             }
     
     @staticmethod

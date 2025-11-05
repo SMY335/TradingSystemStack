@@ -16,8 +16,12 @@ import pandas as pd
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 from scipy.optimize import newton
+import logging
 import warnings
 warnings.filterwarnings('ignore')
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -152,7 +156,11 @@ class PerformanceAttributor:
         try:
             mwr = newton(npv, 0.1)  # Start with 10% guess
             return mwr
-        except:
+        except (RuntimeError, ValueError) as e:
+            logger.warning(f"Failed to calculate MWR using Newton's method: {e}. Returning NaN.")
+            return np.nan
+        except Exception as e:
+            logger.error(f"Unexpected error calculating MWR: {e}", exc_info=True)
             return np.nan
     
     def brinson_attribution(

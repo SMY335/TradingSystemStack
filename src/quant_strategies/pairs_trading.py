@@ -8,11 +8,17 @@ Trades the spread between two correlated assets when it deviates from mean.
 import backtrader as bt
 import pandas as pd
 import numpy as np
+from numpy.linalg import LinAlgError
+import logging
+
 try:
     from statsmodels.tsa.stattools import coint
     STATSMODELS_AVAILABLE = True
 except ImportError:
     STATSMODELS_AVAILABLE = False
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 
 class PairsTradingStrategy(bt.Strategy):
@@ -86,9 +92,12 @@ class PairsTradingStrategy(bt.Strategy):
             try:
                 _, p_value, _ = coint(prices_a, prices_b)
                 if p_value > 0.05:
+                    logger.warning(f"Pairs not cointegrated (p-value: {p_value:.4f})")
                     print(f"⚠️ Warning: Pairs not cointegrated (p-value: {p_value:.4f})")
-            except:
-                pass
+            except (ValueError, LinAlgError) as e:
+                logger.warning(f"Failed to test cointegration: {e}. Proceeding with calculated hedge ratio.")
+            except Exception as e:
+                logger.error(f"Unexpected error testing cointegration: {e}", exc_info=True)
     
     def _calculate_spread(self):
         """Calculate spread and z-score"""
