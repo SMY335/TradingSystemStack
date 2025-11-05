@@ -113,6 +113,26 @@ class BacktraderEMAStrategy(bt.Strategy):
     
     def __init__(self):
         """Initialize strategy"""
+        # Validate fast_period
+        if not isinstance(self.params.fast_period, int):
+            raise TypeError(f"fast_period must be int, got {type(self.params.fast_period)}")
+        
+        if self.params.fast_period <= 0 or self.params.fast_period > 200:
+            raise ValueError(f"fast_period must be between 1 and 200, got {self.params.fast_period}")
+        
+        # Validate slow_period
+        if not isinstance(self.params.slow_period, int):
+            raise TypeError(f"slow_period must be int, got {type(self.params.slow_period)}")
+        
+        if self.params.slow_period <= 0 or self.params.slow_period > 200:
+            raise ValueError(f"slow_period must be between 1 and 200, got {self.params.slow_period}")
+        
+        # Validate relationship
+        if self.params.fast_period >= self.params.slow_period:
+            raise ValueError(
+                f"fast_period ({self.params.fast_period}) must be < slow_period ({self.params.slow_period})"
+            )
+        
         # Create EMA indicators
         self.fast_ema = bt.indicators.ExponentialMovingAverage(
             self.data.close, 
