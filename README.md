@@ -82,6 +82,29 @@ TradingSystemStack/
     └── architecture/       # Architecture documentation
 ```
 
+## 🎯 Key Features
+
+### 📊 Portfolio & Risk Management
+- **VaR Analysis**: Historical, Parametric, and Monte Carlo VaR calculations
+- **CVaR (Expected Shortfall)**: Advanced tail risk metrics
+- **Stress Testing**: Predefined and custom scenario analysis
+- **Monte Carlo Simulation**: 10,000+ path simulations
+- **Performance Attribution**: Brinson, factor, and risk attribution
+- **Interactive Dashboards**: Real-time Streamlit dashboards
+- **Telegram Alerts**: Automated risk notifications
+
+### 🔄 Trading Frameworks
+- **Multi-Engine Backtesting**: Nautilus Trader, Backtrader, VectorBT
+- **Live Trading**: Production-ready execution with Nautilus
+- **Market Making**: Hummingbot integration for liquidity provision
+- **Strategy Optimization**: Walk-forward analysis and parameter tuning
+
+### 📈 Advanced Strategies
+- **ICT Methodology**: Order blocks, liquidity pools, fair value gaps
+- **Statistical Arbitrage**: Pairs trading and mean reversion
+- **Market Making**: Simple and advanced market making strategies
+- **Machine Learning**: Feature engineering and ML integration
+
 ## 📊 Installed Frameworks
 
 | Framework | Version | Purpose |
@@ -95,6 +118,7 @@ TradingSystemStack/
 | Scikit-learn | 1.7.0 | Machine learning |
 | SciPy | 1.16.0 | Scientific computing |
 | Statsmodels | 0.14.5 | Statistical analysis |
+| Streamlit | 1.29.0+ | Interactive dashboards |
 
 ## 📚 Documentation
 
@@ -180,6 +204,75 @@ port = rp.Portfolio(returns=your_returns_df)
 
 # Optimize
 weights = port.optimization(model='Classic', rm='MV', obj='Sharpe')
+```
+
+### Portfolio Risk Management
+
+```python
+from src.portfolio.risk_manager import RiskManager
+import pandas as pd
+
+# Load returns data
+returns = pd.read_csv('returns.csv', index_col=0, parse_dates=True)
+weights = {'BTC': 0.4, 'ETH': 0.3, 'SOL': 0.2, 'AVAX': 0.1}
+
+# Initialize risk manager
+risk_manager = RiskManager(returns, weights)
+
+# Calculate comprehensive risk metrics
+metrics = risk_manager.calculate_risk_metrics()
+print(f"VaR 95%: {metrics.var_95:.2%}")
+print(f"CVaR 95%: {metrics.cvar_95:.2%}")
+print(f"Sharpe Ratio: {metrics.sharpe_ratio:.2f}")
+
+# Run stress tests
+stress_results = risk_manager.stress_test()
+
+# Monte Carlo simulation
+final_values, paths = risk_manager.monte_carlo_simulation(n_simulations=10000)
+
+# Generate report
+report = risk_manager.generate_risk_report()
+print(report)
+```
+
+### Performance Attribution
+
+```python
+from src.portfolio.performance_attribution import PerformanceAttributor
+
+# Initialize attributor
+attributor = PerformanceAttributor(returns, portfolio_weights, benchmark_weights)
+
+# Brinson attribution
+attribution = attributor.brinson_attribution()
+print(f"Active Return: {attribution.active_return:.2%}")
+print(f"Allocation Effect: {attribution.allocation_effect:.2%}")
+print(f"Selection Effect: {attribution.selection_effect:.2%}")
+
+# Factor attribution
+factor_contrib = attributor.factor_attribution()
+
+# Risk attribution
+risk_attr = attributor.risk_attribution()
+print(f"Portfolio Risk: {risk_attr.portfolio_risk:.2%}")
+print(f"Diversification Ratio: {risk_attr.diversification_ratio:.2f}")
+
+# Generate report
+report = attributor.generate_attribution_report()
+```
+
+### Launch Interactive Dashboards
+
+```bash
+# Risk Management Dashboard
+./scripts/launch_risk_dashboard.sh
+
+# Performance Attribution Dashboard
+./scripts/launch_attribution_dashboard.sh
+
+# Or run complete analysis
+python scripts/run_portfolio_analysis.py --output reports/ --telegram
 ```
 
 ## 🛠️ Development

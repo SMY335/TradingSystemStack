@@ -17,6 +17,22 @@ matplotlib>=3.7.0
 seaborn>=0.12.0
 plotly>=5.14.0
 
+# Portfolio & Risk Management
+riskfolio-lib>=6.0.0
+scipy>=1.11.0
+cvxpy>=1.4.0
+
+# Dashboard
+streamlit>=1.29.0
+streamlit-aggrid>=0.3.4
+
+# PDF Reports
+reportlab>=4.0.0
+fpdf2>=2.7.0
+
+# Telegram Integration
+python-telegram-bot>=20.0
+
 # Testing
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
