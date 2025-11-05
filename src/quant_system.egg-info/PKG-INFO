@@ -1,0 +1,23 @@
+Metadata-Version: 2.4
+Name: quant-system
+Version: 0.1.0
+Summary: Vectorbt + Prefect baseline with risk gate and simple execution adapter
+Requires-Python: >=3.11
+Requires-Dist: pandas
+Requires-Dist: numpy
+Requires-Dist: numba
+Requires-Dist: vectorbt
+Requires-Dist: quantstats
+Requires-Dist: empyrical-reloaded
+Requires-Dist: prefect
+Requires-Dist: pydantic
+Requires-Dist: pyyaml
+Requires-Dist: ccxt
+Requires-Dist: ib-async
+Requires-Dist: freqtrade
+Requires-Dist: ta-lib
+Requires-Dist: riskfolio-lib
+Requires-Dist: streamlit
+Requires-Dist: plotly
+Requires-Dist: scikit-learn
+Requires-Dist: scipy
