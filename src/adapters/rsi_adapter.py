@@ -117,6 +117,33 @@ class BacktraderRSIStrategy(bt.Strategy):
     
     def __init__(self):
         """Initialize strategy"""
+        # Validate period
+        if not isinstance(self.params.period, int):
+            raise TypeError(f"period must be int, got {type(self.params.period)}")
+        
+        if self.params.period <= 0 or self.params.period > 100:
+            raise ValueError(f"period must be between 1 and 100, got {self.params.period}")
+        
+        # Validate oversold
+        if not isinstance(self.params.oversold, int):
+            raise TypeError(f"oversold must be int, got {type(self.params.oversold)}")
+        
+        if self.params.oversold <= 0 or self.params.oversold >= 50:
+            raise ValueError(f"oversold must be between 1 and 49, got {self.params.oversold}")
+        
+        # Validate overbought
+        if not isinstance(self.params.overbought, int):
+            raise TypeError(f"overbought must be int, got {type(self.params.overbought)}")
+        
+        if self.params.overbought <= 50 or self.params.overbought >= 100:
+            raise ValueError(f"overbought must be between 51 and 99, got {self.params.overbought}")
+        
+        # Validate relationship
+        if self.params.oversold >= self.params.overbought:
+            raise ValueError(
+                f"oversold ({self.params.oversold}) must be < overbought ({self.params.overbought})"
+            )
+        
         # Create RSI indicator
         self.rsi = bt.indicators.RelativeStrengthIndex(
             self.data.close,
