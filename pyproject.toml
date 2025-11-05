@@ -1,150 +1,18 @@
-[build-system]
-requires = ["setuptools>=65.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
-name = "trading-system-stack"
-version = "2.0.0"
-description = "Institutional-grade algorithmic trading system with multiple framework integration"
-readme = "README.md"
+name = "quant-system"
+version = "0.1.0"
+description = "Vectorbt + Prefect baseline with risk gate and simple execution adapter"
 requires-python = ">=3.11"
-license = {text = "MIT"}
-authors = [
-    {name = "TradingSystemStack Team"}
-]
-keywords = ["trading", "algorithmic-trading", "backtesting", "portfolio-optimization", "market-making"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Financial and Insurance Industry",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Office/Business :: Financial :: Investment",
-]
-
 dependencies = [
-    # Core Trading Frameworks
-    "nautilus_trader>=1.198.0",
-    "backtrader>=1.9.78.123",
-    "riskfolio-lib>=7.0.1",
-    "arcticdb>=6.3.1",
-    "hummingbot>=20250923",
-    
-    # Technical Analysis & ML
-    "ta-lib>=0.6.8",
-    "scikit-learn>=1.7.0",
-    "scipy>=1.16.0",
-    "statsmodels>=0.14.5",
-    "pandas>=2.3.0",
-    "numpy>=2.2.0",
-    
-    # Data & Exchange APIs
-    "ccxt>=4.3.0",
-    "pandas-ta>=0.4.71b",
-    
-    # Web & UI
-    "streamlit>=1.37.0",
-    "plotly>=5.20.0",
-    
-    # Utilities
-    "pydantic>=2.0.0",
-    "pyyaml>=6.0.0",
-    "python-dotenv>=1.0.0",
-    "tqdm>=4.67.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=8.0.0",
-    "pytest-asyncio>=0.23.0",
-    "pytest-cov>=4.1.0",
-    "black>=24.0.0",
-    "ruff>=0.3.0",
-    "mypy>=1.9.0",
-    "ipython>=8.20.0",
-    "jupyter>=1.0.0",
-]
-
-docs = [
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.5.0",
-    "mkdocstrings>=0.24.0",
-]
-
-[project.urls]
-Homepage = "https://github.com/SMY335/TradingSystemStack"
-Documentation = "https://github.com/SMY335/TradingSystemStack/docs"
-Repository = "https://github.com/SMY335/TradingSystemStack"
-Issues = "https://github.com/SMY335/TradingSystemStack/issues"
-
-[tool.setuptools]
-packages = ["src"]
-
-[tool.setuptools.package-data]
-src = ["py.typed"]
-
-[tool.black]
-line-length = 100
-target-version = ['py311', 'py312']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
-
-[tool.ruff]
-line-length = 100
-target-version = "py311"
-select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "C",  # flake8-comprehensions
-    "B",  # flake8-bugbear
-]
-ignore = [
-    "E501",  # line too long (handled by black)
-    "B008",  # do not perform function calls in argument defaults
-    "C901",  # too complex
-]
-
-[tool.ruff.per-file-ignores]
-"__init__.py" = ["F401"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = "-v --cov=src --cov-report=term-missing --cov-report=html"
-asyncio_mode = "auto"
-
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = false
-ignore_missing_imports = true
-
-[tool.coverage.run]
-source = ["src"]
-omit = ["tests/*", "**/__pycache__/*"]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
+  "pandas", "numpy", "numba", "vectorbt",
+  "quantstats", "empyrical-reloaded",
+  "prefect", "pydantic", "pyyaml",
+  "ccxt", "ib-async",
+  "freqtrade",
+  "ta-lib",
+  "riskfolio-lib",
+  "streamlit",
+  "plotly",
+  "scikit-learn",
+  "scipy"
 ]
