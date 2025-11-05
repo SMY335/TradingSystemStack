@@ -12,12 +12,16 @@ Implements comprehensive risk analysis including:
 
 import numpy as np
 import pandas as pd
+import logging
 from scipy import stats
 from scipy.stats import norm, t
 from typing import Dict, List, Optional, Tuple, Union
 from dataclasses import dataclass
 import warnings
 warnings.filterwarnings('ignore')
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -76,21 +80,88 @@ class RiskManager:
             confidence_levels: List of confidence levels for VaR/CVaR
             risk_free_rate: Annual risk-free rate for Sharpe ratio
         """
+        # Validate returns DataFrame
+        if returns is None or not isinstance(returns, pd.DataFrame):
+            raise TypeError("returns must be a pandas DataFrame")
+        
+        if returns.empty:
+            raise ValueError("returns DataFrame cannot be empty")
+        
+        if len(returns) < 30:
+            raise ValueError(f"Insufficient data: {len(returns)} rows. Need at least 30 observations for risk analysis.")
+        
+        # Check for NaN values
+        if returns.isna().any().any():
+            logger.warning("returns DataFrame contains NaN values. These will be dropped for calculations.")
+        
         self.returns = returns
         self.assets = returns.columns.tolist()
         self.n_assets = len(self.assets)
         
-        # Set portfolio weights
-        if portfolio_weights is None:
-            self.weights = {asset: 1.0 / self.n_assets for asset in self.assets}
-        else:
+        if self.n_assets == 0:
+            raise ValueError("returns DataFrame must have at least one column (asset)")
+        
+        # Validate portfolio_weights
+        if portfolio_weights is not None:
+            if not isinstance(portfolio_weights, dict):
+                raise TypeError(f"portfolio_weights must be dict, got {type(portfolio_weights)}")
+            
+            if not portfolio_weights:
+                raise ValueError("portfolio_weights dictionary cannot be empty")
+            
+            # Check that all weights are numeric and non-negative
+            for asset, weight in portfolio_weights.items():
+                if not isinstance(weight, (int, float)):
+                    raise TypeError(f"Weight for {asset} must be numeric, got {type(weight)}")
+                
+                if weight < 0:
+                    raise ValueError(f"Weight for {asset} cannot be negative, got {weight}")
+            
+            # Check that all assets in weights exist in returns
+            missing_assets = set(portfolio_weights.keys()) - set(self.assets)
+            if missing_assets:
+                raise ValueError(f"portfolio_weights contains assets not in returns: {missing_assets}")
+            
+            # Check weight sum is reasonable (allow some tolerance)
+            weight_sum = sum(portfolio_weights.values())
+            if weight_sum <= 0:
+                raise ValueError(f"Sum of portfolio weights must be positive, got {weight_sum}")
+            
+            if weight_sum < 0.99 or weight_sum > 1.01:
+                logger.warning(f"Portfolio weights sum to {weight_sum:.4f}, normalizing to 1.0")
+            
             self.weights = portfolio_weights
+        else:
+            # Set equal weights
+            self.weights = {asset: 1.0 / self.n_assets for asset in self.assets}
             
         # Normalize weights
         total_weight = sum(self.weights.values())
         self.weights = {k: v / total_weight for k, v in self.weights.items()}
         
+        # Validate confidence_levels
+        if not isinstance(confidence_levels, list):
+            raise TypeError(f"confidence_levels must be list, got {type(confidence_levels)}")
+        
+        if not confidence_levels:
+            raise ValueError("confidence_levels list cannot be empty")
+        
+        for level in confidence_levels:
+            if not isinstance(level, (int, float)):
+                raise TypeError(f"Confidence level must be numeric, got {type(level)}")
+            
+            if level <= 0 or level >= 1:
+                raise ValueError(f"Confidence level must be between 0 and 1, got {level}")
+        
         self.confidence_levels = confidence_levels
+        
+        # Validate risk_free_rate
+        if not isinstance(risk_free_rate, (int, float)):
+            raise TypeError(f"risk_free_rate must be numeric, got {type(risk_free_rate)}")
+        
+        if risk_free_rate < -0.1 or risk_free_rate > 0.5:
+            raise ValueError(f"risk_free_rate seems unrealistic: {risk_free_rate}. Expected range: -0.1 to 0.5")
+        
         self.risk_free_rate = risk_free_rate
         
         # Calculate portfolio returns
@@ -99,6 +170,8 @@ class RiskManager:
         # Calculate correlation matrix
         self.correlation_matrix = returns.corr()
         self.covariance_matrix = returns.cov()
+        
+        logger.info(f"RiskManager initialized: {self.n_assets} assets, {len(returns)} observations")
         
     def _calculate_portfolio_returns(self) -> pd.Series:
         """Calculate portfolio returns based on weights"""
@@ -115,6 +188,13 @@ class RiskManager:
         Returns:
             VaR value (positive number represents potential loss)
         """
+        # Validate confidence_level
+        if not isinstance(confidence_level, (int, float)):
+            raise TypeError(f"confidence_level must be numeric, got {type(confidence_level)}")
+        
+        if confidence_level <= 0 or confidence_level >= 1:
+            raise ValueError(f"confidence_level must be between 0 and 1, got {confidence_level}")
+        
         alpha = 1 - confidence_level
         var = -np.percentile(self.portfolio_returns, alpha * 100)
         return var
@@ -129,6 +209,13 @@ class RiskManager:
         Returns:
             VaR value
         """
+        # Validate confidence_level
+        if not isinstance(confidence_level, (int, float)):
+            raise TypeError(f"confidence_level must be numeric, got {type(confidence_level)}")
+        
+        if confidence_level <= 0 or confidence_level >= 1:
+            raise ValueError(f"confidence_level must be between 0 and 1, got {confidence_level}")
+        
         mu = self.portfolio_returns.mean()
         sigma = self.portfolio_returns.std()
         z_score = norm.ppf(1 - confidence_level)
@@ -152,6 +239,33 @@ class RiskManager:
         Returns:
             Tuple of (VaR value, simulated returns array)
         """
+        # Validate confidence_level
+        if not isinstance(confidence_level, (int, float)):
+            raise TypeError(f"confidence_level must be numeric, got {type(confidence_level)}")
+        
+        if confidence_level <= 0 or confidence_level >= 1:
+            raise ValueError(f"confidence_level must be between 0 and 1, got {confidence_level}")
+        
+        # Validate n_simulations
+        if not isinstance(n_simulations, int):
+            raise TypeError(f"n_simulations must be int, got {type(n_simulations)}")
+        
+        if n_simulations < 100:
+            raise ValueError(f"n_simulations too low: {n_simulations}. Need at least 100 for meaningful results.")
+        
+        if n_simulations > 1000000:
+            raise ValueError(f"n_simulations too high: {n_simulations}. Maximum allowed: 1,000,000")
+        
+        # Validate time_horizon
+        if not isinstance(time_horizon, int):
+            raise TypeError(f"time_horizon must be int, got {type(time_horizon)}")
+        
+        if time_horizon < 1:
+            raise ValueError(f"time_horizon must be at least 1 day, got {time_horizon}")
+        
+        if time_horizon > 365:
+            raise ValueError(f"time_horizon too long: {time_horizon} days. Maximum: 365 days")
+        
         mu = self.portfolio_returns.mean()
         sigma = self.portfolio_returns.std()
         
@@ -183,6 +297,18 @@ class RiskManager:
         Returns:
             CVaR value
         """
+        # Validate confidence_level
+        if not isinstance(confidence_level, (int, float)):
+            raise TypeError(f"confidence_level must be numeric, got {type(confidence_level)}")
+        
+        if confidence_level <= 0 or confidence_level >= 1:
+            raise ValueError(f"confidence_level must be between 0 and 1, got {confidence_level}")
+        
+        # Validate method
+        valid_methods = ['historical', 'parametric']
+        if method not in valid_methods:
+            raise ValueError(f"Invalid method '{method}'. Must be one of {valid_methods}")
+        
         if method == 'historical':
             var = self.calculate_var_historical(confidence_level)
             # Average of losses beyond VaR
@@ -196,9 +322,6 @@ class RiskManager:
             z_alpha = norm.ppf(alpha)
             cvar = -(mu - sigma * norm.pdf(z_alpha) / alpha)
             
-        else:
-            raise ValueError(f"Unknown method: {method}")
-        
         return cvar
     
     def stress_test(
@@ -282,6 +405,33 @@ class RiskManager:
         Returns:
             Tuple of (final values array, simulation paths DataFrame)
         """
+        # Validate n_simulations
+        if not isinstance(n_simulations, int):
+            raise TypeError(f"n_simulations must be int, got {type(n_simulations)}")
+        
+        if n_simulations < 100:
+            raise ValueError(f"n_simulations too low: {n_simulations}. Need at least 100.")
+        
+        if n_simulations > 1000000:
+            raise ValueError(f"n_simulations too high: {n_simulations}. Maximum: 1,000,000")
+        
+        # Validate time_horizon
+        if not isinstance(time_horizon, int):
+            raise TypeError(f"time_horizon must be int, got {type(time_horizon)}")
+        
+        if time_horizon < 1:
+            raise ValueError(f"time_horizon must be at least 1 day, got {time_horizon}")
+        
+        if time_horizon > 365 * 5:
+            raise ValueError(f"time_horizon too long: {time_horizon} days. Maximum: 1,825 days (5 years)")
+        
+        # Validate initial_value
+        if not isinstance(initial_value, (int, float)):
+            raise TypeError(f"initial_value must be numeric, got {type(initial_value)}")
+        
+        if initial_value <= 0:
+            raise ValueError(f"initial_value must be positive, got {initial_value}")
+        
         mu = self.portfolio_returns.mean()
         sigma = self.portfolio_returns.std()
         
@@ -346,6 +496,16 @@ class RiskManager:
         Returns:
             DataFrame with rolling correlations
         """
+        # Validate window
+        if not isinstance(window, int):
+            raise TypeError(f"window must be int, got {type(window)}")
+        
+        if window < 10:
+            raise ValueError(f"window too small: {window}. Need at least 10 observations.")
+        
+        if window > len(self.returns):
+            raise ValueError(f"window ({window}) larger than available data ({len(self.returns)})")
+        
         rolling_corr = self.returns.rolling(window=window).corr()
         return rolling_corr
     
@@ -433,6 +593,27 @@ class RiskManager:
         Returns:
             Dictionary with alert types and messages
         """
+        # Validate var_threshold
+        if not isinstance(var_threshold, (int, float)):
+            raise TypeError(f"var_threshold must be numeric, got {type(var_threshold)}")
+        
+        if var_threshold <= 0 or var_threshold > 1:
+            raise ValueError(f"var_threshold must be between 0 and 1, got {var_threshold}")
+        
+        # Validate drawdown_threshold
+        if not isinstance(drawdown_threshold, (int, float)):
+            raise TypeError(f"drawdown_threshold must be numeric, got {type(drawdown_threshold)}")
+        
+        if drawdown_threshold >= 0 or drawdown_threshold < -1:
+            raise ValueError(f"drawdown_threshold must be between -1 and 0, got {drawdown_threshold}")
+        
+        # Validate correlation_threshold
+        if not isinstance(correlation_threshold, (int, float)):
+            raise TypeError(f"correlation_threshold must be numeric, got {type(correlation_threshold)}")
+        
+        if correlation_threshold < 0 or correlation_threshold > 1:
+            raise ValueError(f"correlation_threshold must be between 0 and 1, got {correlation_threshold}")
+        
         alerts = {
             'critical': [],
             'warning': [],
