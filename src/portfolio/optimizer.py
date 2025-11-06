@@ -10,9 +10,12 @@ Implements various optimization strategies:
 
 import pandas as pd
 import numpy as np
+import logging
 import riskfolio as rp
 from typing import Dict, List, Optional, Tuple
 from enum import Enum
+
+logger = logging.getLogger(__name__)
 
 
 class OptimizationMethod(Enum):
@@ -63,9 +66,29 @@ class PortfolioOptimizer:
             frequency: Number of trading periods per year (252 for daily, 12 for monthly)
             alpha: Significance level for risk measures (e.g., 0.05 for 95% VaR)
         """
+        # Validation
+        if not isinstance(risk_free_rate, (int, float)):
+            raise TypeError(f"risk_free_rate must be numeric, got {type(risk_free_rate).__name__}")
+        if risk_free_rate < -1 or risk_free_rate > 1:
+            raise ValueError(f"risk_free_rate must be between -1 and 1, got {risk_free_rate}")
+
+        if not isinstance(frequency, int):
+            raise TypeError(f"frequency must be int, got {type(frequency).__name__}")
+        if frequency <= 0:
+            raise ValueError(f"frequency must be positive, got {frequency}")
+        if frequency > 365:
+            raise ValueError(f"frequency cannot exceed 365 days/year, got {frequency}")
+
+        if not isinstance(alpha, (int, float)):
+            raise TypeError(f"alpha must be numeric, got {type(alpha).__name__}")
+        if not (0 < alpha < 1):
+            raise ValueError(f"alpha must be between 0 and 1, got {alpha}")
+
         self.risk_free_rate = risk_free_rate
         self.frequency = frequency
         self.alpha = alpha
+
+        logger.info(f"PortfolioOptimizer initialized: rf={risk_free_rate:.4f}, freq={frequency}, alpha={alpha}")
 
     def optimize(
         self,
