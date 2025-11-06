@@ -51,6 +51,47 @@ Tests for **Portfolio modules** (RiskManager, PortfolioOptimizer):
 
 **Total: 28 test cases**
 
+### 4. `test_bollinger_validation.py`
+Tests for **BollingerBandsStrategy** parameter validation:
+- ✅ Validates `period` (must be >= 2, <= 200, integer)
+- ✅ Validates `std_dev` (must be positive, <= 10, numeric)
+- ✅ Tests boundary values
+- ✅ Tests Bollinger Bands calculation (upper, middle, lower)
+- ✅ Tests squeeze detection (low volatility periods)
+- ✅ Tests signal generation with OHLC data
+- ✅ Tests edge cases (empty data, insufficient data)
+
+**Total: 24 test cases**
+
+### 5. `test_supertrend_validation.py`
+Tests for **SuperTrendStrategy** parameter validation:
+- ✅ Validates `period` (must be >= 1, <= 50, integer)
+- ✅ Validates `multiplier` (must be positive, <= 10, numeric)
+- ✅ Tests ATR calculation
+- ✅ Tests SuperTrend calculation (trend direction, bands)
+- ✅ Tests signal generation (trend changes)
+- ✅ Tests plotting data generation
+- ✅ Tests edge cases (close-only data, insufficient data)
+- ✅ Tests ATR with various periods
+
+**Total: 26 test cases**
+
+### 6. `test_ichimoku_validation.py`
+Tests for **IchimokuStrategy** parameter validation:
+- ✅ Validates `tenkan_period` (must be >= 1, <= 50, integer)
+- ✅ Validates `kijun_period` (must be >= 1, <= 100, integer)
+- ✅ Validates `senkou_b_period` (must be >= 1, <= 200, integer)
+- ✅ Validates logical constraints (tenkan < kijun < senkou_b)
+- ✅ Tests all 5 Ichimoku components calculation
+- ✅ Tests cloud color determination (bullish/bearish)
+- ✅ Tests price position relative to cloud
+- ✅ Tests Chikou Span shift (backward)
+- ✅ Tests Senkou Spans shift (forward)
+- ✅ Tests signal generation with multiple conditions
+- ✅ Tests edge cases and custom periods
+
+**Total: 30 test cases**
+
 ## Running the Tests
 
 ### Prerequisites
@@ -97,7 +138,10 @@ The tests validate that:
 | test_backtesting_validation.py | 15 | BacktestEngine validation |
 | test_strategy_validation.py | 18 | EMAStrategy validation |
 | test_portfolio_validation.py | 28 | Portfolio modules validation |
-| **TOTAL** | **61** | **Comprehensive validation coverage** |
+| test_bollinger_validation.py | 24 | BollingerBands strategy validation |
+| test_supertrend_validation.py | 26 | SuperTrend strategy validation |
+| test_ichimoku_validation.py | 30 | Ichimoku Cloud strategy validation |
+| **TOTAL** | **141** | **Comprehensive validation coverage** |
 
 ## What These Tests Validate
 
