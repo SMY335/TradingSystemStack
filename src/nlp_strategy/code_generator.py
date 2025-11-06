@@ -7,6 +7,10 @@ from .strategy_parser import StrategyDescription
 from typing import Dict, Any
 import anthropic
 import os
+import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class StrategyCodeGenerator:
@@ -73,8 +77,24 @@ RETOURNE UNIQUEMENT LE CODE PYTHON, sans explications."""
     def save_strategy(self, strategy: StrategyDescription, code: str, output_dir: str = "src/generated_strategies") -> str:
         """Sauvegarder la stratégie générée"""
         import os
+
+        # SECURITY: Validate strategy name to prevent path traversal attacks
+        if not strategy.name or not isinstance(strategy.name, str):
+            raise ValueError("Strategy name must be a non-empty string")
+
+        # Only allow alphanumeric characters, spaces, hyphens, and underscores
+        if not re.match(r'^[a-zA-Z0-9\s_-]+$', strategy.name):
+            raise ValueError(
+                f"Invalid strategy name: '{strategy.name}'. "
+                "Only alphanumeric characters, spaces, hyphens, and underscores are allowed."
+            )
+
+        if len(strategy.name) > 100:
+            raise ValueError("Strategy name too long (max 100 characters)")
+
+        logger.info(f"Saving strategy: {strategy.name}")
         os.makedirs(output_dir, exist_ok=True)
-        
+
         filename = f"{output_dir}/{strategy.name.lower().replace(' ', '_')}.py"
         
         with open(filename, 'w') as f:
