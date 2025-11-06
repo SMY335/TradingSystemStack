@@ -5,12 +5,15 @@ Orchestrates portfolio construction, optimization, and rebalancing
 
 import pandas as pd
 import numpy as np
+import logging
 from typing import Dict, List, Optional, Callable
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 
 from .models import Portfolio, Asset, Position, AssetType
 from .optimizer import PortfolioOptimizer, OptimizationMethod, RiskMeasure
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -62,12 +65,31 @@ class PortfolioManager:
             optimizer: Portfolio optimizer (creates default if None)
             rebalancing_config: Rebalancing configuration
         """
+        # Validation
+        if portfolio is None:
+            raise ValueError("portfolio cannot be None")
+        if not isinstance(portfolio, Portfolio):
+            raise TypeError(f"portfolio must be Portfolio instance, got {type(portfolio).__name__}")
+
+        if data_fetcher is None:
+            raise ValueError("data_fetcher cannot be None")
+        if not callable(data_fetcher):
+            raise TypeError("data_fetcher must be callable")
+
+        if optimizer is not None and not isinstance(optimizer, PortfolioOptimizer):
+            raise TypeError(f"optimizer must be PortfolioOptimizer, got {type(optimizer).__name__}")
+
+        if rebalancing_config is not None and not isinstance(rebalancing_config, RebalancingConfig):
+            raise TypeError(f"rebalancing_config must be RebalancingConfig, got {type(rebalancing_config).__name__}")
+
         self.portfolio = portfolio
         self.data_fetcher = data_fetcher
         self.optimizer = optimizer or PortfolioOptimizer()
         self.rebalancing_config = rebalancing_config or RebalancingConfig()
         self.last_rebalance: Optional[datetime] = None
         self.rebalance_history: List[Dict] = []
+
+        logger.info(f"PortfolioManager initialized with {len(portfolio.positions)} positions")
 
     def should_rebalance(self) -> bool:
         """
@@ -228,7 +250,7 @@ class PortfolioManager:
             return returns_df
 
         except Exception as e:
-            print(f"Error fetching returns data: {e}")
+            logger.error(f"Error fetching returns data: {e}")
             return pd.DataFrame()
 
     def execute_trades(self, trades: Dict[str, float], current_prices: Dict[str, float]) -> Dict:
@@ -251,7 +273,7 @@ class PortfolioManager:
             dollar_amount = weight_change * total_value
 
             if symbol not in current_prices:
-                print(f"Warning: No price for {symbol}, skipping trade")
+                logger.warning(f"No price for {symbol}, skipping trade")
                 continue
 
             price = current_prices[symbol]

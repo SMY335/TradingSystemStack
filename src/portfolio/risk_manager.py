@@ -13,10 +13,13 @@ Provides:
 
 import pandas as pd
 import numpy as np
+import logging
 from typing import Dict, Optional, Tuple, List
 from dataclasses import dataclass
 from scipy import stats
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -74,6 +77,45 @@ class RiskManager:
             risk_free_rate: Annual risk-free rate (default 2%)
             confidence_levels: Confidence levels for VaR/CVaR
         """
+        # Validation
+        if not isinstance(returns, pd.DataFrame):
+            raise TypeError(f"returns must be pandas DataFrame, got {type(returns).__name__}")
+        if returns.empty:
+            raise ValueError("returns DataFrame cannot be empty")
+        if len(returns) < 2:
+            raise ValueError(f"Need at least 2 data points, got {len(returns)}")
+
+        if not isinstance(weights, dict):
+            raise TypeError(f"weights must be dict, got {type(weights).__name__}")
+        if not weights:
+            raise ValueError("weights cannot be empty")
+
+        # Validate weight values
+        for symbol, weight in weights.items():
+            if not isinstance(weight, (int, float)):
+                raise TypeError(f"Weight for {symbol} must be numeric, got {type(weight).__name__}")
+            if weight < 0:
+                raise ValueError(f"Weight for {symbol} cannot be negative: {weight}")
+            if weight > 1:
+                raise ValueError(f"Weight for {symbol} cannot exceed 1: {weight}")
+
+        # Check weights sum to ~1.0 (allow small tolerance)
+        weights_sum = sum(weights.values())
+        if not (0.99 <= weights_sum <= 1.01):
+            logger.warning(f"Weights sum to {weights_sum:.4f}, not 1.0. Normalizing...")
+            weights = {k: v/weights_sum for k, v in weights.items()}
+
+        if not isinstance(risk_free_rate, (int, float)):
+            raise TypeError(f"risk_free_rate must be numeric, got {type(risk_free_rate).__name__}")
+        if risk_free_rate < -1 or risk_free_rate > 1:
+            raise ValueError(f"risk_free_rate must be between -1 and 1, got {risk_free_rate}")
+
+        if not isinstance(confidence_levels, list):
+            raise TypeError(f"confidence_levels must be list, got {type(confidence_levels).__name__}")
+        for level in confidence_levels:
+            if not (0 < level < 1):
+                raise ValueError(f"Confidence level must be between 0 and 1, got {level}")
+
         self.returns = returns
         self.weights = pd.Series(weights)
         self.risk_free_rate = risk_free_rate
@@ -84,6 +126,8 @@ class RiskManager:
 
         # Align weights with returns columns
         self.weights = self.weights.reindex(returns.columns, fill_value=0)
+
+        logger.info(f"RiskManager initialized: {len(returns)} periods, {len(weights)} assets")
 
     def calculate_risk_metrics(self) -> RiskMetrics:
         """
@@ -193,7 +237,13 @@ class RiskManager:
         """
         cumulative = (1 + self.portfolio_returns).cumprod()
         running_max = cumulative.expanding().max()
-        drawdown = (cumulative - running_max) / running_max
+
+        # Protect against division by zero
+        with np.errstate(divide='ignore', invalid='ignore'):
+            drawdown = (cumulative - running_max) / running_max
+            drawdown = drawdown.replace([np.inf, -np.inf], 0)
+            drawdown = drawdown.fillna(0)
+
         return drawdown.min()
 
     def monte_carlo_simulation(
