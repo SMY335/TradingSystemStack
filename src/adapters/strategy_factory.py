@@ -3,6 +3,7 @@ Strategy Factory
 Creates strategy instances for different frameworks using adapters
 """
 from typing import Dict, Any
+import logging
 from src.adapters.base_strategy_adapter import (
     BaseStrategyAdapter,
     StrategyConfig,
@@ -11,6 +12,8 @@ from src.adapters.base_strategy_adapter import (
 from src.adapters.ema_adapter import EMAAdapter
 from src.adapters.rsi_adapter import RSIAdapter
 from src.adapters.macd_adapter import MACDAdapter
+
+logger = logging.getLogger(__name__)
 
 
 class StrategyFactory:
@@ -133,8 +136,9 @@ class StrategyFactory:
                 'parameter_space': adapter.get_parameter_space(),
                 'supported_frameworks': ['nautilus', 'backtrader']
             }
-        except Exception:
+        except (ValueError, KeyError, TypeError, AttributeError) as e:
             # If validation fails with empty params, return basic info
+            logger.warning(f"Failed to get parameter space for {strategy_name}: {e}")
             return {
                 'name': strategy_name,
                 'adapter_class': adapter_class.__name__,
