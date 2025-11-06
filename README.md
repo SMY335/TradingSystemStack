@@ -94,7 +94,9 @@ TradingSystemStack/
 - **Telegram Alerts**: Automated risk notifications
 
 ### 🔄 Trading Frameworks
-- **Multi-Engine Backtesting**: Nautilus Trader, Backtrader, VectorBT
+- **Unified Backtesting Interface**: Consistent API across multiple engines
+- **Backtrader Engine**: Event-driven, detailed backtesting (recommended)
+- **VectorBT Engine**: Fast vectorized backtesting for rapid iterations
 - **Live Trading**: Production-ready execution with Nautilus
 - **Market Making**: Hummingbot integration for liquidity provision
 - **Strategy Optimization**: Walk-forward analysis and parameter tuning
@@ -182,16 +184,54 @@ manager.write_market_data("BTC/USDT", df)
 data = manager.read_market_data("BTC/USDT")
 ```
 
-### Run Backtest with Nautilus
+### Unified Backtesting
 
 ```python
-from nautilus_trader.backtest.engine import BacktestEngine
-from nautilus_trader.model.identifiers import Venue
+from src.backtesting import create_backtest_engine, BacktestConfig
 
-engine = BacktestEngine()
-venue = Venue("BINANCE")
-# Add data, strategies, and run backtest
+# Create configuration
+config = BacktestConfig(
+    initial_capital=10000,
+    fees_pct=0.1,
+    slippage_pct=0.05
+)
+
+# Create engine (Backtrader by default - recommended for detailed analysis)
+engine = create_backtest_engine('backtrader', config)
+
+# Or use VectorBT for speed
+# engine = create_backtest_engine('vectorbt', config)
+
+# Run backtest
+result = engine.run(strategy, data)
+
+# Access standardized results
+print(f"Return: {result.total_return_pct:.2f}%")
+print(f"Sharpe: {result.sharpe_ratio:.2f}")
+print(f"Max DD: {result.max_drawdown_pct:.2f}%")
+print(f"Trades: {result.total_trades}")
+print(f"Win Rate: {result.win_rate_pct:.1f}%")
 ```
+
+### Available Backtesting Engines
+
+**Backtrader** (Recommended)
+- Event-driven, detailed execution simulation
+- Best for complex strategies with order management
+- Full analyzer suite (Sharpe, Sortino, Calmar, etc.)
+- Realistic slippage and commission models
+
+**VectorBT** (Fast)
+- Vectorized computation, ultra-fast
+- Best for parameter optimization and screening
+- Ideal for simple signal-based strategies
+- Quick iteration cycles
+
+**Both engines return standardized `BacktestResult` with 15+ metrics:**
+- Returns: Total, Annualized
+- Risk: Sharpe, Sortino, Calmar, Max Drawdown, Volatility
+- Trading: Total Trades, Win Rate, Profit Factor
+- Advanced: SQN, Exposure Time, Trade Duration
 
 ### Optimize Portfolio with Riskfolio
 
