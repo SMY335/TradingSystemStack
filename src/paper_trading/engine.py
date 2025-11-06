@@ -34,6 +34,27 @@ class PaperTradingEngine:
             slippage_pct: Slippage percentage (0.05 = 0.05%)
             max_position_size_pct: Max position size as % of capital (100 = 100%)
         """
+        # Validation
+        if not isinstance(initial_capital, (int, float)):
+            raise TypeError(f"initial_capital must be numeric, got {type(initial_capital).__name__}")
+        if initial_capital <= 0:
+            raise ValueError(f"initial_capital must be positive, got {initial_capital}")
+
+        if not isinstance(fees_pct, (int, float)):
+            raise TypeError(f"fees_pct must be numeric, got {type(fees_pct).__name__}")
+        if fees_pct < 0 or fees_pct > 100:
+            raise ValueError(f"fees_pct must be between 0 and 100, got {fees_pct}")
+
+        if not isinstance(slippage_pct, (int, float)):
+            raise TypeError(f"slippage_pct must be numeric, got {type(slippage_pct).__name__}")
+        if slippage_pct < 0 or slippage_pct > 100:
+            raise ValueError(f"slippage_pct must be between 0 and 100, got {slippage_pct}")
+
+        if not isinstance(max_position_size_pct, (int, float)):
+            raise TypeError(f"max_position_size_pct must be numeric, got {type(max_position_size_pct).__name__}")
+        if max_position_size_pct <= 0 or max_position_size_pct > 100:
+            raise ValueError(f"max_position_size_pct must be between 0 and 100, got {max_position_size_pct}")
+
         self.initial_capital = initial_capital
         self.fees_pct = fees_pct / 100
         self.slippage_pct = slippage_pct / 100
@@ -82,6 +103,15 @@ class PaperTradingEngine:
         Returns:
             Quantity to buy/sell
         """
+        # Validation
+        if not isinstance(symbol, str) or not symbol:
+            raise ValueError(f"symbol must be non-empty string, got {symbol!r}")
+
+        if not isinstance(price, (int, float)):
+            raise TypeError(f"price must be numeric, got {type(price).__name__}")
+        if price <= 0:
+            raise ValueError(f"price must be positive, got {price}")
+
         available_capital = self.portfolio.current_capital * self.max_position_size_pct
         max_quantity = available_capital / price
 
