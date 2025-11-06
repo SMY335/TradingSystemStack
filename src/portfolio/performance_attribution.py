@@ -13,10 +13,13 @@ Provides:
 
 import pandas as pd
 import numpy as np
+import logging
 from typing import Dict, Optional, Tuple, List
 from dataclasses import dataclass
 from datetime import datetime
 from scipy.optimize import newton
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -281,8 +284,9 @@ class PerformanceAttributor:
         try:
             irr = newton(npv, 0.1, maxiter=100)
             return irr
-        except:
-            # Fallback to TWR if IRR calculation fails
+        except (RuntimeError, ValueError, ZeroDivisionError, AttributeError) as e:
+            # Fallback to TWR if IRR calculation fails (non-convergence, invalid data, etc.)
+            logger.warning(f"IRR calculation failed: {e}. Falling back to TWR.")
             return self.time_weighted_return()
 
     def rolling_attribution(
