@@ -86,7 +86,7 @@ def normalize_timeframe(tf: str) -> str:
         tf: Timeframe string in any supported format
 
     Returns:
-        Normalized timeframe (e.g., '1h', '1d', '1w')
+        Normalized timeframe (e.g., '1h', '1d', '1w', '1M')
 
     Raises:
         TimeframeError: If timeframe format is invalid
@@ -98,14 +98,27 @@ def normalize_timeframe(tf: str) -> str:
         '1d'
         >>> normalize_timeframe('5min')
         '5m'
+        >>> normalize_timeframe('1M')
+        '1M'
     """
-    tf_lower = tf.lower().strip()
+    tf_stripped = tf.strip()
 
-    # Check if already normalized
+    # Check if already normalized (case-sensitive for 'M')
+    if tf_stripped in TIMEFRAME_MAP:
+        return tf_stripped
+
+    # Check aliases (case-sensitive first for 'M')
+    if tf_stripped in TIMEFRAME_ALIASES:
+        normalized = TIMEFRAME_ALIASES[tf_stripped]
+        logger.debug(f"Normalized {tf} → {normalized}")
+        return normalized
+
+    # Try case-insensitive for other timeframes
+    tf_lower = tf_stripped.lower()
+
     if tf_lower in TIMEFRAME_MAP:
         return tf_lower
 
-    # Check aliases
     if tf_lower in TIMEFRAME_ALIASES:
         normalized = TIMEFRAME_ALIASES[tf_lower]
         logger.debug(f"Normalized {tf} → {normalized}")
