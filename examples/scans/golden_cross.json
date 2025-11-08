@@ -1,0 +1,31 @@
+{
+  "name": "Golden Cross Scanner",
+  "description": "Find stocks where SMA(50) crosses above SMA(200)",
+  "universe": ["SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT", "GOOGL", "AMZN", "TSLA"],
+  "timeframe": "1d",
+  "lookback": 250,
+  "indicators": [
+    {
+      "name": "SMA",
+      "params": {
+        "period": 50
+      },
+      "alias": "sma_50"
+    },
+    {
+      "name": "SMA",
+      "params": {
+        "period": 200
+      },
+      "alias": "sma_200"
+    }
+  ],
+  "conditions": {
+    "type": "cross",
+    "series1": "sma_50",
+    "series2": "sma_200",
+    "direction": "above",
+    "lookback": 5
+  },
+  "max_results": 20
+}
