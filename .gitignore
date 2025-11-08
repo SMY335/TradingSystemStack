@@ -44,8 +44,8 @@ Thumbs.db
 .env
 .env.local
 
-# Data
+# Data files (but not src/data/ which is source code)
 *.csv
 *.parquet
-data/
+/data/
 !data/.gitkeep
