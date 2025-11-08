@@ -1,0 +1,25 @@
+{
+  "name": "RSI Oversold Scanner",
+  "description": "Find stocks with RSI below 30 (oversold condition)",
+  "universe": ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NVDA", "AMD", "NFLX", "DIS"],
+  "timeframe": "1d",
+  "lookback": 100,
+  "indicators": [
+    {
+      "name": "RSI",
+      "params": {
+        "period": 14
+      },
+      "alias": "rsi"
+    }
+  ],
+  "conditions": {
+    "type": "comparison",
+    "left": "rsi",
+    "operator": "<",
+    "right": 30
+  },
+  "sort_by": "rsi",
+  "sort_ascending": true,
+  "max_results": 10
+}

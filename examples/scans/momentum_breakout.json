@@ -1,0 +1,57 @@
+{
+  "name": "Momentum Breakout Scanner",
+  "description": "Find stocks breaking out with strong momentum: price > SMA(50), RSI > 60, volume > 1.5x average",
+  "universe": ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "META", "NVDA", "AMD", "NFLX", "CRM", "ADBE", "PYPL", "SQ", "SHOP", "UBER"],
+  "timeframe": "1d",
+  "lookback": 100,
+  "indicators": [
+    {
+      "name": "SMA",
+      "params": {
+        "period": 50
+      },
+      "alias": "sma_50"
+    },
+    {
+      "name": "RSI",
+      "params": {
+        "period": 14
+      },
+      "alias": "rsi"
+    },
+    {
+      "name": "SMA",
+      "params": {
+        "period": 20,
+        "field": "volume"
+      },
+      "alias": "avg_volume"
+    }
+  ],
+  "conditions": {
+    "type": "and",
+    "conditions": [
+      {
+        "type": "comparison",
+        "left": "close",
+        "operator": ">",
+        "right": "sma_50"
+      },
+      {
+        "type": "comparison",
+        "left": "rsi",
+        "operator": ">",
+        "right": 60
+      },
+      {
+        "type": "comparison",
+        "left": "volume",
+        "operator": ">",
+        "right": "avg_volume"
+      }
+    ]
+  },
+  "sort_by": "rsi",
+  "sort_ascending": false,
+  "max_results": 15
+}
