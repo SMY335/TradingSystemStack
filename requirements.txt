@@ -1,0 +1,60 @@
+# TradingSystemStack - Requirements
+# Python 3.10+
+
+# Core Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# CLI
+typer==0.9.0
+rich==13.7.0
+
+# Data Processing
+pandas==2.1.4
+numpy==1.26.3
+scipy==1.11.4
+
+# Data Validation
+pydantic==2.5.3
+
+# Technical Indicators (Optional but recommended)
+# Note: TA-Lib requires system library installation first
+# Ubuntu/Debian: sudo apt-get install ta-lib
+# macOS: brew install ta-lib
+# Then: pip install TA-Lib
+# TA-Lib==0.4.28
+
+# Visualization
+plotly==5.18.0
+matplotlib==3.8.2
+
+# Data Sources
+yfinance==0.2.35
+requests==2.31.0
+
+# Database/Caching (Optional)
+# arctic==1.79.4  # For MongoDB time-series storage
+
+# Economic Data (Optional)
+# fredapi==0.5.1  # For FRED economic data
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.23.3
+pytest-cov==4.1.0
+
+# Code Quality (Optional)
+# black==23.12.1
+# flake8==7.0.0
+# mypy==1.8.0
+
+# HTTP Client for testing
+httpx==0.26.0
+
+# Timezone handling
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Additional utilities
+python-dotenv==1.0.0
