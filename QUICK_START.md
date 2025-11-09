@@ -1,6 +1,23 @@
 # ⚡ Quick Start - TradingSystemStack
 
-Démarrage ultra-rapide en 3 étapes!
+Démarrage ultra-rapide depuis GitHub!
+
+---
+
+## 📥 ÉTAPE 0: Installation (Si Pas Déjà Fait)
+
+**Si vous n'avez pas encore le code localement:**
+
+```bash
+# 1. Cloner depuis GitHub
+git clone https://github.com/SMY335/TradingSystemStack.git
+cd TradingSystemStack
+
+# 2. Installer les dépendances
+pip install -r requirements.txt
+```
+
+**📚 Guide d'installation complet**: Voir `INSTALLATION.md`
 
 ---
 
