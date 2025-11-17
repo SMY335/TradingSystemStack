@@ -1,0 +1,60 @@
+image: gitpod/workspace-python-3.11
+
+tasks:
+  - name: Setup Environment
+    init: |
+      # Install system dependencies for TA-Lib
+      sudo apt-get update
+      sudo apt-get install -y wget build-essential
+
+      # Install TA-Lib C library
+      cd /tmp
+      wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+      tar -xzf ta-lib-0.4.0-src.tar.gz
+      cd ta-lib/
+      ./configure --prefix=/usr
+      make
+      sudo make install
+      cd $THEIA_WORKSPACE_ROOT
+
+      # Install Python dependencies
+      pip install --upgrade pip
+      pip install -r requirements_frameworks.txt 2>/dev/null || true
+      pip install pandas numpy numba vectorbt quantstats empyrical-reloaded
+      pip install prefect pydantic pyyaml ccxt ib-async
+      pip install freqtrade riskfolio-lib streamlit plotly scikit-learn scipy
+
+      # Make scripts executable
+      chmod +x *.sh
+
+      # Create directories
+      mkdir -p logs data
+
+      echo "✅ Setup complete!"
+    command: |
+      echo "🚀 TradingSystemStack Ready!"
+      echo ""
+      echo "Quick start:"
+      echo "  ./run_dashboard.sh           - Backtesting"
+      echo "  ./run_live_dashboard.sh      - Live Trading"
+      echo "  ./run_portfolio_dashboard.sh - Portfolio"
+
+ports:
+  - port: 8501
+    onOpen: notify
+    name: Backtesting Dashboard
+    description: Main backtesting interface
+  - port: 8502
+    onOpen: notify
+    name: Live Trading Dashboard
+    description: Real-time trading interface
+  - port: 8503
+    onOpen: notify
+    name: Portfolio Dashboard
+    description: Portfolio management interface
+
+vscode:
+  extensions:
+    - ms-python.python
+    - ms-python.vscode-pylance
+    - ms-toolsai.jupyter
