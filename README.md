@@ -4,6 +4,15 @@
 
 Construit avec des frameworks professionnels (VectorBT, CCXT, Streamlit) et une architecture modulaire extensible.
 
+## 🌐 Utilisation 100% En Ligne
+
+**Droits limités sur votre PC ?** Lancez l'application directement dans votre navigateur :
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#YOUR_REPO_URL)
+
+**➡️ [Guide Complet d'Utilisation En Ligne](./ONLINE_SETUP_GUIDE.md)** - Configuration Codespaces, Gitpod, Replit
+
 ---
 
 ## 🎯 Fonctionnalités Principales
